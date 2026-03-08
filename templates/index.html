@@ -14,9 +14,86 @@
         }
         h1 {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-size: 24px;
         }
+        .stats-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #272727;
+            color: #aaaaaa;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin: 0 10px;
+            border: 1px solid #3d3d3d;
+        }
+        .badge strong {
+            color: #f1f1f1;
+        }
+        
+        /* Controles de Filtro (Botões) */
+        .filter-controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .yt-btn {
+            background-color: #272727;
+            color: #f1f1f1;
+            border: 1px solid #3d3d3d;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin: 0 5px;
+            font-family: inherit;
+        }
+        .yt-btn:hover {
+            background-color: #3f3f3f;
+        }
+        .yt-btn:active {
+            transform: scale(0.95);
+        }
+        #btn-limpar {
+            display: none; /* Escondido por padrão, só aparece se tiver filtro marcado */
+        }
+
+        /* Painel de Filtros (Agora escondido por padrão) */
+        .filter-container {
+            background-color: #181818;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto 30px auto;
+            border: 1px solid #3d3d3d;
+            display: none; /* Oculto inicialmente */
+        }
+        .checkbox-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .checkbox-label {
+            color: #aaaaaa;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+        .checkbox-label:hover {
+            color: #ffffff;
+        }
+        input[type="checkbox"] {
+            cursor: pointer;
+            accent-color: #cc0000;
+        }
+
         .video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -65,25 +142,6 @@
         a {
             text-decoration: none;
         }
-        
-        /* Novos estilos da barra de status */
-        .stats-container {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .badge {
-            display: inline-block;
-            background-color: #272727;
-            color: #aaaaaa;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            margin: 0 10px;
-            border: 1px solid #3d3d3d;
-        }
-        .badge strong {
-            color: #f1f1f1;
-        }
     </style>
 </head>
 <body>
@@ -99,9 +157,25 @@
         </div>
     </div>
 
+    <div class="filter-controls">
+        <button id="btn-toggle-filtros" class="yt-btn">Filtros 🔽</button>
+        <button id="btn-limpar" class="yt-btn">Limpar Filtros ✖</button>
+    </div>
+
+    <div id="painel-filtros" class="filter-container">
+        <div class="checkbox-grid">
+            {% for canal in canais %}
+            <label class="checkbox-label">
+                <input type="checkbox" class="channel-filter" value="{{ canal }}">
+                {{ canal }}
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+
     <div class="video-grid">
         {% for video in videos %}
-        <div class="video-card">
+        <div class="video-card" data-canal="{{ video.canal }}">
             <a href="/watch/{{ video.video_id }}" target="_blank">
                 <img class="thumbnail" src="{{ video.thumbnail }}" alt="Thumbnail">
                 <div class="info">
@@ -113,6 +187,65 @@
         </div>
         {% endfor %}
     </div>
+
+    <script>
+        const btnToggle = document.getElementById('btn-toggle-filtros');
+        const btnLimpar = document.getElementById('btn-limpar');
+        const painelFiltros = document.getElementById('painel-filtros');
+        const checkboxes = document.querySelectorAll('.channel-filter');
+        const videoCards = document.querySelectorAll('.video-card');
+
+        // Lógica para Abrir/Fechar o painel de filtros
+        btnToggle.addEventListener('click', () => {
+            if (painelFiltros.style.display === 'none' || painelFiltros.style.display === '') {
+                painelFiltros.style.display = 'block';
+                btnToggle.innerHTML = 'Filtros 🔼';
+            } else {
+                painelFiltros.style.display = 'none';
+                btnToggle.innerHTML = 'Filtros 🔽';
+            }
+        });
+
+        // Função que processa a filtragem dos vídeos
+        function atualizarFiltros() {
+            // Pega os valores apenas dos checkboxes marcados
+            const canaisMarcados = Array.from(checkboxes)
+                .filter(i => i.checked)
+                .map(i => i.value);
+
+            // Mostra ou esconde o botão "Limpar Filtros" de forma inteligente
+            if (canaisMarcados.length > 0) {
+                btnLimpar.style.display = 'inline-block';
+            } else {
+                btnLimpar.style.display = 'none';
+            }
+
+            // Mostra ou esconde os vídeos
+            videoCards.forEach(card => {
+                if (canaisMarcados.length === 0) {
+                    card.style.display = ''; // Mostra tudo
+                } else {
+                    const canalDoVideo = card.getAttribute('data-canal');
+                    if (canaisMarcados.includes(canalDoVideo)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none'; // Esconde
+                    }
+                }
+            });
+        }
+
+        // Lógica para o botão "Limpar Filtros"
+        btnLimpar.addEventListener('click', () => {
+            checkboxes.forEach(cb => cb.checked = false); // Desmarca tudo
+            atualizarFiltros(); // Roda a função para voltar todos os vídeos pra tela
+        });
+
+        // Adiciona o "espião" de mudança em todos os checkboxes
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', atualizarFiltros);
+        });
+    </script>
 
 </body>
 </html>

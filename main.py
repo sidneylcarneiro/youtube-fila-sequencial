@@ -27,7 +27,7 @@ def exibir_fila(request: Request):
     nao_assistidos = db.contar_nao_assistidos()
     
     if nao_assistidos == 0:
-        print("\n=> Fila zerada! Acordando a API do YouTube...")
+        print("\n=> Fila zerada! Acordando a API do YouTube para buscar vídeos novos...")
         try:
             inscricoes = yt.get_subscriptions()
             videos_recentes = yt.get_recent_videos(inscricoes, dias=21)
@@ -40,10 +40,12 @@ def exibir_fila(request: Request):
         except Exception as e:
             print(f"\n❌ ERRO DE CONEXÃO: {e}")
             
-    # Busca os dados do banco
+    # Busca os vídeos do banco
     videos_fila = db.get_videos_nao_assistidos()
     
-    # --- NOVIDADE AQUI: Pegamos as estatísticas para mandar pro HTML ---
+    # --- O SEGREDO ESTÁ AQUI: Extrai uma lista de canais únicos em ordem alfabética ---
+    canais_unicos = sorted(list(set(video['canal'] for video in videos_fila)))
+    
     total_restantes = len(videos_fila)
     ultima_atualizacao = db.get_ultima_atualizacao()
     
@@ -52,8 +54,9 @@ def exibir_fila(request: Request):
         {
             "request": request, 
             "videos": videos_fila,
-            "total_restantes": total_restantes,       # Variável nova
-            "ultima_atualizacao": ultima_atualizacao  # Variável nova
+            "canais": canais_unicos,                  # <-- Enviando a lista pro HTML!
+            "total_restantes": total_restantes,       
+            "ultima_atualizacao": ultima_atualizacao  
         }
     )
 
