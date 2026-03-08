@@ -22,33 +22,32 @@ Assista ao conteúdo na ordem exata em que foi publicado, sem distrações e sem
 ## ⚙️ Como Instalar e Rodar
 
 1. Clone o repositório:
-   ```bash
-   git clone [https://github.com/sidneylcarneiro/youtube-fila-sequencial.git](https://github.com/sidneylcarneiro/youtube-fila-sequencial.git)
+    ```bash
+    git clone [https://github.com/sidneylcarneiro/youtube-fila-sequencial.git](https://github.com/sidneylcarneiro/youtube-fila-sequencial.git)
 
-```
+    ```
 
 2. Crie e ative o ambiente virtual:
-```bash
-python -m venv venv
-source venv/bin/activate
+    ```bash
+    python -m venv venv
+    source venv/bin/activate
 
-```
-
+    ```
 
 3. Instale as dependências:
-```bash
-pip install -r requirements.txt
+    ```bash
+    pip install -r requirements.txt
 
-```
+    ```
 
+4. **Configuração da API:** 
+    Obtenha suas credenciais OAuth 2.0 (App para Computador) no [Google Cloud Console](https://console.cloud.google.com/) e salve o arquivo como `client_secret.json` na raiz do projeto.
 
-4. **Configuração da API:** Obtenha suas credenciais OAuth 2.0 (App para Computador) no [Google Cloud Console](https://console.cloud.google.com/) e salve o arquivo como `client_secret.json` na raiz do projeto.
 5. **Inicie o Servidor:**
-```bash
-uvicorn main:app
+    ```bash
+    uvicorn main:app
 
-```
-
+    ```
 
 *O navegador abrirá automaticamente no endereço `http://127.0.0.1:8000` na primeira execução, solicitando o login do Google para gerar o `token.pickle`.*
 
