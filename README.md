@@ -53,4 +53,4 @@ Assista ao conteúdo na ordem exata em que foi publicado, sem distrações e sem
 
 ## 🔒 Segurança
 
-O arquivo `.gitignore` já está configurado para não subir o seu `token.pickle`, `client_secret.json` e `fila.db`. Mantenha essas credenciais estritamente locais.
+O arquivo `.gitignore` precisa ser configurado para não subir o seu `token.pickle`, `client_secret.json` e `fila.db`. Mantenha essas credenciais estritamente locais.
