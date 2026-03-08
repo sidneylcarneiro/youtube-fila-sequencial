@@ -1,0 +1,13 @@
+client_secret.json
+token.pickle
+.env
+
+fila.db
+
+__pycache__/
+*.pyc
+src/__pycache__/
+
+venv/
+
+.DS_Store
